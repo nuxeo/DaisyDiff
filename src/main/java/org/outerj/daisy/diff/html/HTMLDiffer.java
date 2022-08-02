@@ -113,7 +113,13 @@ public class HTMLDiffer implements Differ{
      */
     public void diff(TextNodeComparator leftComparator,
             TextNodeComparator rightComparator) throws SAXException {
+        diff(leftComparator, rightComparator, -1);
+    }
+
+    public void diff(TextNodeComparator leftComparator, TextNodeComparator rightComparator, long diffLimit)
+            throws SAXException {
         LCSSettings settings = new LCSSettings();
+        settings.setDiffLimit(diffLimit);
         settings.setUseGreedyMethod(false);
         // settings.setPowLimit(1.5);
         // settings.setTooLong(100000*100000);
