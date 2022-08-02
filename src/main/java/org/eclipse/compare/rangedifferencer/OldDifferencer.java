@@ -12,6 +12,7 @@ package org.eclipse.compare.rangedifferencer;
 
 import java.util.ArrayList;
 
+import org.eclipse.compare.internal.LCSSettings;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 
@@ -74,6 +75,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 
     public static RangeDifference[] findDifferences(IProgressMonitor pm,
             IRangeComparator left, IRangeComparator right) {
+        return findDifferences(pm, new LCSSettings(), left, right);
+    }
+
+    public static RangeDifference[] findDifferences(IProgressMonitor pm, LCSSettings settings, IRangeComparator left,
+            IRangeComparator right) {
 
         // assert that both IRangeComparators are of the same class
         Assert.isTrue(right.getClass().equals(left.getClass()));
@@ -114,7 +120,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
         // " " + upper);
 
         // for each value of the edit distance
-        for (int d = 1; d <= maxDiagonal; ++d) { // d is the current edit
+        long limit = settings.getDiffLimit();
+        for (int d = 1, diffs = 0; d <= maxDiagonal && (diffs <= limit || limit == -1); ++d) { // d is the current edit
                                                     // distance
 
             if (pm != null)
@@ -124,7 +131,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
                 return EMPTY_RESULT; // should be something we already found
 
             // for each relevant diagonal (-d, -d+2 ..., d-2, d)
-            for (int k = lower; k <= upper; k += 2) { // k is the current
+            for (int k = lower; k <= upper; k += 2, diffs++) { // k is the current
                                                         // diagonal
                 LinkedRangeDifference edit;
 
